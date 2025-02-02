@@ -1,0 +1,16 @@
+Napraviti vaadin aplikaciju čija je funkcija sakupljanje robe na terenu.
+
+Entiteti u aplikaciji su sledeći
+Firma (naziv, pib)
+Nalog
+Stavka naloga
+Roba (naziv, sifra)
+Korisnik (ime, prezime, telefon, username, pass, rola)  XXX
+
+Korisnik aplikacije odlazi na teren i sakuplja robu od neke x firme, neophodno je da kreira nalog za svaku firmu i na nalog 
+doda koju je robu sakupio i koju kolicinu te robe. 
+Zapamtiti vreme kreiranja naloga i korisnika koji je napravio nalog
+Omoguciti pregled svih entiteta kao i crud operacije nad svima entitetima korisnicima koji imaju admin rolu
+
+https://start.vaadin.com/?preset=lts
+

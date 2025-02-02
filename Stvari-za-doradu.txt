@@ -1,0 +1,18 @@
+Nedostaci i spisak stvari koje treba da se dorade:
+
+-Nema obrade exceptiona iz baze. Npr. ako ne ko pokusa da doda korisnika sa vec postojecim korisnickim imenom,
+	i drugih stvari koje seu UNIQUE.
+-Sad sam tek skontao da nisam stavljao SECURED anotacije na backendu odnosno da nisam implementirao security tamo,
+	ali to je za sad najmanji posao i najmanji problem.
+-U pocetku sam kreiranje i izmenu entiteta radio preko dto objekata, kada sam dosao do entiteta koji imaju vise veza ka drugim
+	entitetima aplikacija je pucala pri konverziji entiteta, tako da je samo izlistavanje i prikaz entiteta ostalo sa DTO.
+-Na backendu sam zaboravio da stavim validator za PIB firme da ga ogranicim na 9 cifara, dok sam na frontu to uradio.
+-Treba bolje formatirati datum i njegov prikaz u tabelama.
+-Add i edit funkcije sam mogao mozda spojiti u jednu jer je vecina koda slicna od kad radim sa binderom.
+-Prikaz (izlistavanje) korisnikovih naloga (findByKorisnikID) nije uradjen kao lazy loading.
+-Pri kreiranju naloga mozda treba obezbediti da stavke naloga mogu biti null, odnosno roba u njima itd.
+-Pri kreiranju i izmeni korisnika videti sta raditi sa passwordom. Ja sam ostavio i pri kreiranju i pri izmeni da se mora uneti polje,
+	i da ono nije bindovano iz baze (jer se radi o hes vrednosti). Verovatno treba drugacije odraditi, ali za sada je tako.
+-Za sada korisnik role user ne moze da kreira stavku naloga nego pri kreiranju naloga mora da odabere neku od postojecih.
+-Mozda treba kada odem na prikaz svih naloga uvezati nekako i prikaz njegovih stavki?
+-***Izmeniti kreiranje naloga od strane ulogovanog korisnika, odnosno da mu izbor stavki naloga, robe i kolicine bude laksi
