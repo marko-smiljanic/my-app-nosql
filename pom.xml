@@ -11,13 +11,13 @@
 
     <properties>
         <java.version>21</java.version>
-        <vaadin.version>24.4.8</vaadin.version>
+        <vaadin.version>24.6.4</vaadin.version>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.8</version>
+        <version>3.3.4</version>
     </parent>
 
     <repositories>
@@ -101,19 +101,16 @@
             <version>2.4.4</version> <!-- verzija koja je dostupna -->
         </dependency>
 
-
+        <!-- zavisnost za arango, spring starter je obavezan -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.arangodb</groupId>
             <artifactId>arangodb-spring-data</artifactId>
-            <version>3.6.0</version>
+            <version>4.5.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.arangodb</groupId>
-            <artifactId>arangodb-spring-boot-starter</artifactId>
-            <version>2.3.3.RELEASE</version>
-        </dependency>
-
 
 
     </dependencies>

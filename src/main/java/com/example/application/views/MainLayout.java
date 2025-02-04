@@ -68,7 +68,6 @@ public class MainLayout extends AppLayout {
         Header header = new Header(appName);
 
         Scroller scroller = new Scroller(createNavigation());
-
         addToDrawer(header, scroller, createFooter());
     }
 
