@@ -1,0 +1,65 @@
+stavke naloga sam implementirao kao edge kolekciju cisto da bih video iz koda kako sve funkcionise, a i bilo mi je lakse jer nisam morao
+u tom slucaju ceo frontend da menjam
+
+neko drugo resenje bi bilo da se u entitet (kolekciju) Nalog doda atribut stavka koja bi bila niz kolicine i robaId (jer je roba entitet)
+
+primer: 
+
+{
+  "_key": "nalog_123",
+  "vremeKreiranja": "2024-02-04T10:30:00",
+  "stavke": [
+    {
+      "robaId": "roba_456",
+      "kolicina": 10
+    },
+    {
+      "robaId": "roba_789",
+      "kolicina": 5
+    }
+  ]
+}
+
+Zakljucak: 
+
+*Stavke naloga edge kolekcija:
+
+Prednosti:
+
+-Edge pretraga je efikasnija i brza i mogu se dodati novi atributi u buducnosti. Na primer upit za sve naloge koji sadrze odredjenu robu
+je "skup" u odnosu nba edge upit.
+-Bolja kontrola duplikata (ukoliko je potrebno) - proverava se da li postoji veza pre dodavanja. 
+-Bolja paralelna manipulacija (dodavanje vise korisnika u isto vreme) - jer se pre dodavanja ne ucitava trenutno stanje u bazi i samim tim se 
+podaci tada ne mogu izgubiti
+
+Mane:
+
+-su komplikovaniji upiti i rucno brisanje edge kolekcije kada se obrise nalog
+
+if (stavkaNalogaRepository.existsByNalogAndRoba(nalog, roba)) {
+    throw new IllegalArgumentException("Ova roba je već dodata u nalog!");
+}
+
+stavkaNalogaRepository.deleteByNalogAndRoba(nalog, roba);
+
+---------------------------------------------------------------------------------------
+
+*Nalog niz objekata:
+
+-Prednosti:
+
+Manje kompleksno. Brze dobavljanje svih naloga sa robom
+
+
+Mane: 
+
+-teza pretraga (skeniranje cele Nalog kolekcije umesto edge indeksa). Lakse moze doci do dupliranja podataka. Teze dodavanje
+dodatnih atributa. Teze je obrisati samo jednu robu jer se onda mora azurirati i entitet (dodatna operacija). Mana u paralelnoj manipulaciji
+od strane vise korisnika, gde se mogu izgubiti podaci
+
+---------------------------------------------------------------------------------------
+
+SQL (JOIN) → pretražuje i spaja više tabela, što usporava upit na velikim podacima.
+Graf (OUTBOUND/INBOUND) → koristi pointere između čvorova, pa brzo pronalazi povezane entitete bez skeniranja cele baze.
+
+
