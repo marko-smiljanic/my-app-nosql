@@ -15,9 +15,7 @@ public class Nalog {
     private String id;
 
     private LocalDateTime vremeKreiranja;
-
     private Long userId;   //Id korisnika iz SQL baze
-
     private Long firmaId;   //Id firme iz SQL baze
 
 

@@ -12,8 +12,9 @@ import java.util.Set;
 public class Roba {
     @Id
     private String id;
+
     private String naziv;
-    private String sifra;
+    private String sifra;           //kako da bude unique??
 
 
     public Roba() {

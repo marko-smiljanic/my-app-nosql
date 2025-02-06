@@ -154,7 +154,7 @@ public class TabelaNalogView extends Div {
                         nalog -> nalog.getUserId() != null ? userService.findById(nalog.getUserId()).map(UserDTO::getUsername).orElse("") : "",
                         (nalog, username) -> {
                             if (username != null) {
-                                User user = userService.findByUsername(username); // NE KORISTIMO Optional
+                                User user = userService.findByUsername(username);       // NE KORISTIMO Optional
                                 nalog.setUserId(user != null ? user.getId() : null);
                             } else {
                                 nalog.setUserId(null);

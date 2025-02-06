@@ -13,12 +13,10 @@ public class StavkaNaloga {
     private String id;
 
     private int kolicina;
-
     @From
-    private Nalog nalog;    //veza sa Nalog dokumentom (entitetom)
-
+    private Nalog nalog;     //veza sa Nalog dokumentom (entitetom)
     @To
-    private Roba roba;    //veza sa Roba dokumentom (entitetom)
+    private Roba roba;       //veza sa Roba dokumentom (entitetom)
 
 
     public StavkaNaloga() {
