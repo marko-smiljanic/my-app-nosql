@@ -211,20 +211,6 @@ public class KreiranjeNalogaView extends Div {
                         (nalog, firma) -> nalog.setFirmaId(firma != null ? firma.getId() : null)
                 );
 
-//        binder.forField(stavkaMultiSelectComboBox)
-//                .asRequired("Field is required")
-//                .bind(
-//                        nalog -> new HashSet<>(stavkaNalogaService.findByNalogId(nalog.getId())), // Ručno dohvatamo stavke iz servisa
-//                        (nalog, stavke) -> {
-//
-//                            // Povezujemo nove stavke sa nalogom i čuvamo ih u bazi
-//                            stavke.forEach(stavka -> {
-//                                stavka.setNalog(nalog);
-//                                stavkaNalogaService.create(stavka);
-//                            });
-//                        }
-//                );
-
         Button saveButton = new Button("Save", event -> {
             Nalog nalog = new Nalog();
             nalog.setUserId(ulogovani.getId()); // Čuvamo samo ID korisnika
