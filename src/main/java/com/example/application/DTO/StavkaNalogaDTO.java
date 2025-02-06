@@ -8,26 +8,34 @@ import jakarta.persistence.*;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class StavkaNalogaDTO {
-    private Long id;
+    private String id;
     private int kolicina;
-    private NalogDTO nalog;
-    private RobaDTO roba;
+    private Nalog nalog;
+    private Roba roba;
 
     public StavkaNalogaDTO() {
     }
 
-    public StavkaNalogaDTO(Long id, int kolicina, NalogDTO nalog, RobaDTO roba) {
+//    public StavkaNalogaDTO(String id, int kolicina, String nalogId, String robaId) {
+//        this.id = id;
+//        this.kolicina = kolicina;
+//        this.nalogId = nalogId;
+//        this.robaId = robaId;
+//    }
+
+
+    public StavkaNalogaDTO(String id, int kolicina, Nalog nalog, Roba roba) {
         this.id = id;
         this.kolicina = kolicina;
         this.nalog = nalog;
         this.roba = roba;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -39,19 +47,19 @@ public class StavkaNalogaDTO {
         this.kolicina = kolicina;
     }
 
-    public NalogDTO getNalog() {
+    public Nalog getNalog() {
         return nalog;
     }
 
-    public void setNalog(NalogDTO nalog) {
+    public void setNalog(Nalog nalog) {
         this.nalog = nalog;
     }
 
-    public RobaDTO getRoba() {
+    public Roba getRoba() {
         return roba;
     }
 
-    public void setRoba(RobaDTO roba) {
+    public void setRoba(Roba roba) {
         this.roba = roba;
     }
 }

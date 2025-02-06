@@ -14,30 +14,31 @@ import java.util.Set;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class NalogDTO {
-    private Long id;
+
+    private String id;
     private LocalDateTime vremeKreiranja;
-    private UserDTO user;
-    private FirmaDTO firma;
+    private Long userId;
+    private Long firmaId;
     @JsonIgnore
-    private Set<StavkaNalogaDTO> stavkeNaloga = new HashSet<>();
+    private Set<String> stavkeNalogaIds = new HashSet<>();
 
 
 
     public NalogDTO() {
     }
 
-    public NalogDTO(Long id, LocalDateTime vremeKreiranja, UserDTO user, FirmaDTO firma) {
+    public NalogDTO(String id, LocalDateTime vremeKreiranja, Long userId, Long firmaId) {
         this.id = id;
         this.vremeKreiranja = vremeKreiranja;
-        this.user = user;
-        this.firma = firma;
+        this.userId = userId;
+        this.firmaId = firmaId;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -49,27 +50,28 @@ public class NalogDTO {
         this.vremeKreiranja = vremeKreiranja;
     }
 
-    public UserDTO getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(UserDTO user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public FirmaDTO getFirma() {
-        return firma;
+    public Long getFirmaId() {
+        return firmaId;
     }
 
-    public void setFirma(FirmaDTO firma) {
-        this.firma = firma;
+    public void setFirmaId(Long firmaId) {
+        this.firmaId = firmaId;
     }
 
-    public Set<StavkaNalogaDTO> getStavkeNaloga() {
-        return stavkeNaloga;
+    public Set<String> getStavkeNalogaIds() {
+        return stavkeNalogaIds;
     }
 
-    public void setStavkeNaloga(Set<StavkaNalogaDTO> stavkeNaloga) {
-        this.stavkeNaloga = stavkeNaloga;
+    public void setStavkeNalogaIds(Set<String> stavkeNalogaIds) {
+        this.stavkeNalogaIds = stavkeNalogaIds;
     }
+
 }

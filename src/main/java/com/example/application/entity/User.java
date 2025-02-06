@@ -33,9 +33,6 @@ public class User extends AbstractEntity {
     //@Column(length = 1000000)
     private byte[] profilePicture;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Nalog> nalog = new HashSet<Nalog>();
-
 
 
 
@@ -93,14 +90,6 @@ public class User extends AbstractEntity {
 
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
-    }
-
-    public Set<Nalog> getNalog() {
-        return nalog;
-    }
-
-    public void setNalog(Set<Nalog> nalog) {
-        this.nalog = nalog;
     }
 
 

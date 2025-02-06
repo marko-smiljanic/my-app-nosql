@@ -33,6 +33,8 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 @RolesAllowed("ADMIN")
 @PageTitle("Nalozi")
 @Route(value = "nalozi", layout = MainLayout.class)
@@ -61,24 +63,26 @@ public class TabelaNalogView extends Div {
         //Kreiranje grida
         grid = new Grid<>(NalogDTO.class, false);
         grid.addColumn(NalogDTO::getVremeKreiranja).setHeader("Vreme kreiranja");
-        //grid.addColumn(NalogDTO::getUser).setHeader("User");
+        // Kolona za User (učitavanje korisnika po ID-u)
         grid.addColumn(nalog -> {
-            UserDTO userDTO = nalog.getUser();
-            if (userDTO != null) {
-                return userDTO.getUsername() + " (" + userDTO.getIme() + " " + userDTO.getPrezime() + ")";
-            } else {
-                return "N/A";
+            if (nalog.getUserId() != null) {
+                return userService.findById(nalog.getUserId())
+                        .map(user -> user.getUsername() + " (" + user.getIme() + " " + user.getPrezime() + ")")
+                        .orElse("N/A");
             }
+            return "N/A";
         }).setHeader("User");
-        //grid.addColumn(NalogDTO::getFirma).setHeader("Firma");
+
+        // Kolona za Firmu (učitavanje firme po ID-u)
         grid.addColumn(nalog -> {
-            FirmaDTO firmaDTO = nalog.getFirma();
-            if (firmaDTO != null) {
-                return firmaDTO.getNaziv();
-            } else {
-                return "N/A";
+            if (nalog.getFirmaId() != null) {
+                return firmaService.findById(nalog.getFirmaId())
+                        .map(Firma::getNaziv)
+                        .orElse("N/A");
             }
+            return "N/A";
         }).setHeader("Firma");
+
         grid.setSizeFull();
 
         grid.addColumn(new ComponentRenderer<>(nalogDTO -> {
@@ -110,8 +114,10 @@ public class TabelaNalogView extends Div {
         add(horizontalLayout);
     }
 
-    private void deleteNalog(Long id){
-        nalogService.deleteById(id);
+    private void deleteNalog(String id){
+        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA Brisanje naloga sa ID: " + id);
+        nalogService.deleteById(String.valueOf(id));
+        //nalogService.deleteById(id);
         this.osveziPrikaz();
     }
 
@@ -145,13 +151,13 @@ public class TabelaNalogView extends Div {
         binder.forField(usernameField)
                 .asRequired("Field is required")
                 .bind(
-                        nalog -> nalog.getUser() != null ? nalog.getUser().getUsername() : "",
+                        nalog -> nalog.getUserId() != null ? userService.findById(nalog.getUserId()).map(UserDTO::getUsername).orElse("") : "",
                         (nalog, username) -> {
                             if (username != null) {
-                                User user = userService.findByUsername(username);
-                                nalog.setUser(user);
+                                User user = userService.findByUsername(username); // NE KORISTIMO Optional
+                                nalog.setUserId(user != null ? user.getId() : null);
                             } else {
-                                nalog.setUser(null);
+                                nalog.setUserId(null);
                             }
                         }
                 );
@@ -159,15 +165,15 @@ public class TabelaNalogView extends Div {
         binder.forField(firmaField)
                 .asRequired("Field is required")
                 .bind(
-                    nalog -> nalog.getFirma() != null ? nalog.getFirma().getPib() : "",
-                    (nalog, firmaPib) -> {
-                        if (firmaPib != null) {
-                            Firma firma = firmaService.findByPib(firmaPib);
-                            nalog.setFirma(firma);
-                        } else {
-                            nalog.setFirma(null);
+                        nalog -> nalog.getFirmaId() != null ? firmaService.findById(nalog.getFirmaId()).map(Firma::getPib).orElse("") : "",
+                        (nalog, firmaPib) -> {
+                            if (firmaPib != null) {
+                                Firma firma = firmaService.findByPib(firmaPib);
+                                nalog.setFirmaId(firma != null ? firma.getId() : null); // Čuvamo samo ID firme
+                            } else {
+                                nalog.setFirmaId(null);
+                            }
                         }
-                    }
                 );
 
         Button saveButton = new Button("Save", event -> {
@@ -215,30 +221,33 @@ public class TabelaNalogView extends Div {
         binder.forField(usernameField)
                 .asRequired("Field is required")
                 .bind(
-                    nalogDTO -> nalogDTO.getUser() != null ? nalogDTO.getUser().getUsername() : "",
-                    (nalogDTO, username) -> {
-                        if (username != null) {
-                            User user = userService.findByUsername(username);
-                            nalogDTO.setUser(user);
-                        } else {
-                            nalogDTO.setUser(null);
+                        nalogDTO -> nalogDTO.getUserId() != null ?
+                                userService.findById(nalogDTO.getUserId()).map(UserDTO::getUsername).orElse("") : "",
+                        (nalogDTO, username) -> {
+                            if (username != null) {
+                                User user = userService.findByUsername(username);
+                                nalogDTO.setUserId(user != null ? user.getId() : null); // Postavljamo samo ID
+                            } else {
+                                nalogDTO.setUserId(null);
+                            }
                         }
-                    }
                 );
 
         binder.forField(firmaField)
                 .asRequired("Field is required")
                 .bind(
-                    nalogDTO -> nalogDTO.getFirma() != null ? nalogDTO.getFirma().getPib() : "",
-                    (nalogDTO, firmaPib) -> {
-                        if (firmaPib != null) {
-                            Firma firma = firmaService.findByPib(firmaPib);
-                            nalogDTO.setFirma(firma);
-                        } else {
-                            nalogDTO.setFirma(null);
+                        nalogDTO -> nalogDTO.getFirmaId() != null ?
+                                firmaService.findById(nalogDTO.getFirmaId()).map(Firma::getPib).orElse("") : "",
+                        (nalogDTO, firmaPib) -> {
+                            if (firmaPib != null) {
+                                Firma firma = firmaService.findByPib(firmaPib);
+                                nalogDTO.setFirmaId(firma != null ? firma.getId() : null); // Postavljamo samo ID
+                            } else {
+                                nalogDTO.setFirmaId(null);
+                            }
                         }
-                    }
                 );
+
 
         //da popuni polja inicijalno u formu
         Nalog nn = Konverzija.konvertujUEntitet(dto, Nalog.class);

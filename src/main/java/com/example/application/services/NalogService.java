@@ -34,7 +34,23 @@ public class NalogService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Nalog> findById(Long id) {
+
+//    @Transactional
+//    public List<NalogDTO> lazyFindAll(int page, int pageSize) {
+//        int offset = page * pageSize;
+//
+//        return repository.findAllPaginated(offset, pageSize).stream()
+//                .map(nalog -> {
+//                    System.out.println("AAAAAAAAAAAAAAAAAAAAANalog ID iz ArangoDB: " + nalog.getId()); // Provera
+//                    NalogDTO dto = Konverzija.konvertujUDto(nalog, NalogDTO.class);
+//                    dto.setId(nalog.getId()); // Ručno postavi ID (_key)
+//                    return dto;
+//                })
+//                .collect(Collectors.toList());
+//    }
+
+
+    public Optional<Nalog> findById(String id) {
         return repository.findById(id);
     }
 
@@ -56,7 +72,7 @@ public class NalogService {
         return null;
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         repository.deleteById(id);
     }
 }

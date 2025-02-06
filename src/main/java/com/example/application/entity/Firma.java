@@ -18,9 +18,6 @@ public class Firma {
     @Column(nullable = false, unique = true)
     private String pib;
 
-    @OneToMany(mappedBy = "firma")
-    private Set<Nalog> nalozi = new HashSet<Nalog>();
-
 
 
     public Firma() {
@@ -54,14 +51,6 @@ public class Firma {
 
     public void setPib(String pib) {
         this.pib = pib;
-    }
-
-    public Set<Nalog> getNalozi() {
-        return nalozi;
-    }
-
-    public void setNalozi(Set<Nalog> nalozi) {
-        this.nalozi = nalozi;
     }
 
 

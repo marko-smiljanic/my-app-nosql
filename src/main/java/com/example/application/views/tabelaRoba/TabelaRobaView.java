@@ -127,7 +127,7 @@ public class TabelaRobaView extends Div {
         dialog.open();
     }
 
-    private void deleteRoba(Long id){
+    private void deleteRoba(String id){
         this.robaService.deleteById(id);
         this.osveziPrikaz();
     }

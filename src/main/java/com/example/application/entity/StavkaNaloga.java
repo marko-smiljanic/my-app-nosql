@@ -1,39 +1,40 @@
 package com.example.application.entity;
 
-import jakarta.persistence.*;
+import com.arangodb.springframework.annotation.Edge;
+import com.arangodb.springframework.annotation.From;
+import com.arangodb.springframework.annotation.To;
+//import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
 
-@Entity
+
+@Edge("StavkaNaloga")
 public class StavkaNaloga {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private int kolicina;
 
-    @ManyToOne
-    private Nalog nalog;
+    @From
+    private Nalog nalog;    //veza sa Nalog dokumentom (entitetom)
 
-    @ManyToOne
-    private Roba roba;
-
+    @To
+    private Roba roba;    //veza sa Roba dokumentom (entitetom)
 
 
     public StavkaNaloga() {
     }
 
-    public StavkaNaloga(Long id, int kolicina, Nalog nalog, Roba roba) {
-        this.id = id;
+    public StavkaNaloga(int kolicina, Nalog nalog, Roba roba) {
         this.kolicina = kolicina;
         this.nalog = nalog;
         this.roba = roba;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -65,6 +65,11 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public Optional<UserDTO> findById(Long userId) {
+        return repository.findById(userId)
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getIme(), user.getPrezime(), user.getUsername(), user.getProfilePicture()));
+    }
+
     @Transactional
     public User getUserById(Long id) {
         return repository.findById(id).orElseThrow();

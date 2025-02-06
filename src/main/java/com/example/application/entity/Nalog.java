@@ -1,56 +1,42 @@
 package com.example.application.entity;
 
-import jakarta.persistence.*;
+import com.arangodb.springframework.annotation.Document;
+//import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;   //ZA ARANGO ENTITET MORA OVA ANOTACIJA, NE JAKARTINA !!!!!!
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+
+@Document("Nalog")
 public class Nalog {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private LocalDateTime vremeKreiranja;
 
-    @ManyToOne
-    private User user;
+    private Long userId;   //Id korisnika iz SQL baze
 
-    @ManyToOne
-    //@JoinColumn(name = "firma_id", nullable = false)
-    private Firma firma;
-
-    @OneToMany(mappedBy = "nalog")
-    private Set<StavkaNaloga> stavkeNaloga = new HashSet<StavkaNaloga>();
+    private Long firmaId;   //Id firme iz SQL baze
 
 
     public Nalog() {
     }
 
-    public Nalog(Long id, LocalDateTime vremeKreiranja, User user, Firma firma) {
-        this.id = id;
+    public Nalog(LocalDateTime vremeKreiranja, Long userId, Long firmaId) {
         this.vremeKreiranja = vremeKreiranja;
-        this.user = user;
-        this.firma = firma;
+        this.userId = userId;
+        this.firmaId = firmaId;
     }
 
-    public Long getId() {
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public Set<StavkaNaloga> getStavkeNaloga() {
-        return stavkeNaloga;
-    }
-
-    public void setStavkeNaloga(Set<StavkaNaloga> stavkeNaloga) {
-        this.stavkeNaloga = stavkeNaloga;
     }
 
     public LocalDateTime getVremeKreiranja() {
@@ -61,21 +47,19 @@ public class Nalog {
         this.vremeKreiranja = vremeKreiranja;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public Firma getFirma() {
-        return firma;
+    public Long getFirmaId() {
+        return firmaId;
     }
 
-    public void setFirma(Firma firma) {
-        this.firma = firma;
+    public void setFirmaId(Long firmaId) {
+        this.firmaId = firmaId;
     }
-
-
 }

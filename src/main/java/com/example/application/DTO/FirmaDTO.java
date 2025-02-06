@@ -14,8 +14,12 @@ public class FirmaDTO {
     private Long id;
     private String naziv;
     private String pib;
+
     @JsonIgnore
-    private Set<NalogDTO> nalozi = new HashSet<>();
+    private Set<String> naloziIds = new HashSet<>();
+    //ovo polje nemam u entitetu i ovde nema smisla ali bi moglo da se popuni kada bih u nalog repository imao metudu
+    // koju bih pozivao pri kreiranju firme dto, jedino tako se kroz spring mogu povezati relacije na obe strane
+
 
     public FirmaDTO() {
     }
@@ -50,11 +54,11 @@ public class FirmaDTO {
         this.pib = pib;
     }
 
-    public Set<NalogDTO> getNalozi() {
-        return nalozi;
+    public Set<String> getNalozi() {
+        return naloziIds;
     }
 
-    public void setNalozi(Set<NalogDTO> nalozi) {
-        this.nalozi = nalozi;
+    public void setNalozi(Set<String> naloziIds) {
+        this.naloziIds = naloziIds;
     }
 }

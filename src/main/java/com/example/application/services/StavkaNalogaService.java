@@ -24,7 +24,7 @@ public class StavkaNalogaService {
     }
 
     public List<StavkaNaloga> findAll() {
-        return repository.findAll();
+        return (List<StavkaNaloga>) repository.findAll();
     }
 
 
@@ -36,7 +36,7 @@ public class StavkaNalogaService {
     }
 
 
-    public Optional<StavkaNaloga> findById(Long id) {
+    public Optional<StavkaNaloga> findById(String id) {
         return repository.findById(id);
     }
 
@@ -51,7 +51,16 @@ public class StavkaNalogaService {
         return null;
     }
 
-    public void deleteById(Long id) {
+    public List<StavkaNaloga> findByNalogId(String nalogId) {
+        return repository.findByNalogId(nalogId);
+    }
+
+    @Transactional
+    public void deleteByNalogId(String nalogId) {
+        repository.deleteByNalogId(nalogId);
+    }
+
+    public void deleteById(String id) {
         repository.deleteById(id);
     }
 }

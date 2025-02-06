@@ -21,7 +21,7 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
 
     public LoginView(AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
-        setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
+        setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));   //automatski se salje login zahtev kada korisnik unese podatke, daljke preuzima spring security
 
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
@@ -34,7 +34,7 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         setOpened(true);
     }
 
-    //ako je korisnik vec prijavljen onda ga saljemo na neku stranicu, ne otvaramo ovaj view
+    //ako je korisnik vec prijavljen onda ga saljemo na neku stranicu, ne otvaramo ovaj view, znaci poziva se pre renderovanja stranice
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         if (authenticatedUser.get().isPresent()) {

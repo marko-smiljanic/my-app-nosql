@@ -1,41 +1,34 @@
 package com.example.application.entity;
 
-import jakarta.persistence.*;
+import com.arangodb.springframework.annotation.Document;
+//import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+
+@Document("Roba")
 public class Roba {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+    private String id;
     private String naziv;
-
-    @Column(nullable = false, unique = true)
     private String sifra;
 
 
-    @OneToMany(mappedBy = "roba")
-    private Set<StavkaNaloga> stavkeNaloga = new HashSet<StavkaNaloga>();
-
-    
     public Roba() {
     }
 
-    public Roba(Long id, String naziv, String sifra) {
-        this.id = id;
+    public Roba(String naziv, String sifra) {
         this.naziv = naziv;
         this.sifra = sifra;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -53,13 +46,5 @@ public class Roba {
 
     public void setSifra(String sifra) {
         this.sifra = sifra;
-    }
-
-    public Set<StavkaNaloga> getStavkeNaloga() {
-        return stavkeNaloga;
-    }
-
-    public void setStavkeNaloga(Set<StavkaNaloga> stavkeNaloga) {
-        this.stavkeNaloga = stavkeNaloga;
     }
 }

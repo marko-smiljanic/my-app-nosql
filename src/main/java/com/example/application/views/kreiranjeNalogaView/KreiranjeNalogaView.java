@@ -41,7 +41,10 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @RolesAllowed({"ADMIN", "USER"})
 @PageTitle("Kreiranje naloga")
@@ -76,28 +79,31 @@ public class KreiranjeNalogaView extends Div {
     }
 
     private void iscrtajGrid() {
-        //Kreiranje grida
+        // Kreiranje grida
         grid = new Grid<>(NalogDTO.class, false);
+
         grid.addColumn(NalogDTO::getVremeKreiranja).setHeader("Vreme kreiranja");
-        //grid.addColumn(NalogDTO::getUser).setHeader("User");
+
+        // Kolona za User (učitavanje korisnika po ID-u)
         grid.addColumn(nalog -> {
-            UserDTO userDTO = nalog.getUser();
-            if (userDTO != null) {
-                return userDTO.getUsername() + " (" + userDTO.getIme() + " " + userDTO.getPrezime() + ")";
-            } else {
-                return "N/A";
+            if (nalog.getUserId() != null) {
+                Optional<UserDTO> userDTO = userService.findById(nalog.getUserId());
+                return userDTO.map(u -> u.getUsername() + " (" + u.getIme() + " " + u.getPrezime() + ")").orElse("N/A");
             }
+            return "N/A";
         }).setHeader("User");
-        //grid.addColumn(NalogDTO::getFirma).setHeader("Firma");
+
+        // Kolona za Firmu (učitavanje firme po ID-u)
         grid.addColumn(nalog -> {
-            FirmaDTO firmaDTO = nalog.getFirma();
-            if (firmaDTO != null) {
-                return firmaDTO.getNaziv();
-            } else {
-                return "N/A";
+            if (nalog.getFirmaId() != null) {
+                Optional<Firma> firmaDTO = firmaService.findById(nalog.getFirmaId());
+                return firmaDTO.map(Firma::getNaziv).orElse("N/A");
             }
+            return "N/A";
         }).setHeader("Firma");
+
         grid.setSizeFull();
+
 
 //        grid.addColumn(new ComponentRenderer<>(nalogDTO -> {
 //            HorizontalLayout layout = new HorizontalLayout();
@@ -112,8 +118,8 @@ public class KreiranjeNalogaView extends Div {
 //            layout.add(editButton, deleteButton);
 //            return layout;
 //        })).setHeader("Actions");
-
-        //grid.setItems(query -> nalogService.lazyFindAll(query.getPage(), query.getPageSize()).stream());
+//
+//        grid.setItems(query -> nalogService.lazyFindAll(query.getPage(), query.getPageSize()).stream());
 //        List<UserDTO> users = userService.findAll2();
 //        grid.setItems(users);
 
@@ -149,7 +155,7 @@ public class KreiranjeNalogaView extends Div {
         add(horizontalLayout);
     }
 
-    private void deleteNalog(Long id){
+    private void deleteNalog(String id){
         nalogService.deleteById(id);
         this.osveziPrikaz();
     }
@@ -160,7 +166,7 @@ public class KreiranjeNalogaView extends Div {
     }
 
 
-    private void addNalog(){
+    private void addNalog() {
         Dialog dialog = new Dialog();
         dialog.setWidth("500px");
 
@@ -174,19 +180,19 @@ public class KreiranjeNalogaView extends Div {
         usernameField.setReadOnly(true);
         usernameField.setValue(ulogovani.getUsername());
 
-
         ComboBox<Firma> firmaComboBox = new ComboBox<>("Firma");
         firmaComboBox.setItems(firmaService.findAll());
-        firmaComboBox.setItemLabelGenerator(firma ->
-                firma.getNaziv() + " (" + firma.getPib() + ")"
-        );
+        firmaComboBox.setItemLabelGenerator(firma -> firma.getNaziv() + " (" + firma.getPib() + ")");
         firmaComboBox.setRequiredIndicatorVisible(true);
 
-        //multi select za stavke naloga
+        // Multi-select za stavke naloga (sada koristi ID-jeve umesto referenci)
         MultiSelectComboBox<StavkaNaloga> stavkaMultiSelectComboBox = new MultiSelectComboBox<>("Stavka naloga");
         stavkaMultiSelectComboBox.setItems(stavkaNalogaService.findAll());
-        stavkaMultiSelectComboBox.setItemLabelGenerator(stavka -> "(" + stavka.getId() + ") " + "Roba: " + stavka.getRoba().getNaziv() + ", kolicina: " + stavka.getKolicina());
+        stavkaMultiSelectComboBox.setItemLabelGenerator(stavka ->
+                "(" + stavka.getId() + ") " + "Roba: " + stavka.getRoba().getId() + ", kolicina: " + stavka.getKolicina()
+        );
 
+        // Bindovanje polja
         binder.forField(vremeField)
                 .asRequired("Field is required")
                 .bind(Nalog::getVremeKreiranja, Nalog::setVremeKreiranja);
@@ -194,29 +200,45 @@ public class KreiranjeNalogaView extends Div {
         binder.forField(usernameField)
                 .asRequired("Field is required")
                 .bind(
-                        nalog -> nalog.getUser() != null ? nalog.getUser().getUsername() : "",
-                        (nalog, username) -> {} //ne treba postaviti, korisnik je dohvacen globalno
+                        nalog -> nalog.getUserId() != null ? String.valueOf(nalog.getUserId()) : "",
+                        (nalog, username) -> {} // Ne postavljamo user-a, već ga dohvatamo globalno
                 );
 
         binder.forField(firmaComboBox)
                 .asRequired("Field is required")
                 .bind(
-                        Nalog::getFirma,
-                        Nalog::setFirma
+                        nalog -> nalog.getFirmaId() != null ? firmaService.findById(nalog.getFirmaId()).orElse(null) : null,
+                        (nalog, firma) -> nalog.setFirmaId(firma != null ? firma.getId() : null)
                 );
 
-        binder.forField(stavkaMultiSelectComboBox)
-                .asRequired("Field is required")
-                .bind(Nalog::getStavkeNaloga, Nalog::setStavkeNaloga);
-
+//        binder.forField(stavkaMultiSelectComboBox)
+//                .asRequired("Field is required")
+//                .bind(
+//                        nalog -> new HashSet<>(stavkaNalogaService.findByNalogId(nalog.getId())), // Ručno dohvatamo stavke iz servisa
+//                        (nalog, stavke) -> {
+//
+//                            // Povezujemo nove stavke sa nalogom i čuvamo ih u bazi
+//                            stavke.forEach(stavka -> {
+//                                stavka.setNalog(nalog);
+//                                stavkaNalogaService.create(stavka);
+//                            });
+//                        }
+//                );
 
         Button saveButton = new Button("Save", event -> {
             Nalog nalog = new Nalog();
-            //nalog.setVremeKreiranja(LocalDateTime.now());   //ipak cu da setujem u formi i da bindujem odande
-            nalog.setUser(ulogovani);
+            nalog.setUserId(ulogovani.getId()); // Čuvamo samo ID korisnika
 
             if (binder.writeBeanIfValid(nalog)) {
                 nalogService.create(nalog);
+
+                //kreiramo novu edge kolekciju stavki naloga
+                Set<StavkaNaloga> odabraneStavke = stavkaMultiSelectComboBox.getValue();
+                for (StavkaNaloga stavka : odabraneStavke) {
+                    StavkaNaloga novaStavka = new StavkaNaloga(stavka.getKolicina(), nalog, stavka.getRoba());
+                    //stavka.setNalog(nalog); // Postavljamo referencu na nalog
+                    stavkaNalogaService.create(novaStavka); // Čuvamo u bazi
+                }
 
                 this.osveziPrikaz();
                 dialog.close();

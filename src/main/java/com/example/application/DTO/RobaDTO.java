@@ -11,26 +11,26 @@ import java.util.Set;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class RobaDTO {
-    private Long id;
+    private String id;
     private String naziv;
     private String sifra;
     @JsonIgnore
-    private Set<StavkaNalogaDTO> stavkeNaloga = new HashSet<>();
+    private Set<String> stavkeNaloga = new HashSet<>();
 
     public RobaDTO() {
     }
 
-    public RobaDTO(Long id, String naziv, String sifra) {
+    public RobaDTO(String id, String naziv, String sifra) {
         this.id = id;
         this.naziv = naziv;
         this.sifra = sifra;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -50,11 +50,11 @@ public class RobaDTO {
         this.sifra = sifra;
     }
 
-    public Set<StavkaNalogaDTO> getStavkeNaloga() {
+    public Set<String> getStavkeNaloga() {
         return stavkeNaloga;
     }
 
-    public void setStavkeNaloga(Set<StavkaNalogaDTO> stavkeNaloga) {
+    public void setStavkeNaloga(Set<String> stavkeNaloga) {
         this.stavkeNaloga = stavkeNaloga;
     }
 }

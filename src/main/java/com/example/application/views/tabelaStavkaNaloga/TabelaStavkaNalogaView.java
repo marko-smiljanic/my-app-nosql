@@ -65,24 +65,24 @@ public class TabelaStavkaNalogaView extends Div {
         grid = new Grid<>(StavkaNalogaDTO.class, false);
         grid.addColumn(StavkaNalogaDTO::getKolicina).setHeader("Kolicina");
         //grid.addColumn(NalogDTO::getUser).setHeader("User");
+
         grid.addColumn(stavkaNaloga -> {
-            NalogDTO nalogDTO = stavkaNaloga.getNalog();
-            if (nalogDTO != null) {
-                //return nalogDTO.getUser().getUsername() + " (" + nalogDTO.getUser().getIme() + " " + nalogDTO.getUser().getPrezime() + ")";
-                //System.out.println("AAAAAAAAAAAAAAAAAAAAAAAA " + nalogDTO.getUser().getUsername());    //rado
-                return "Id: " + nalogDTO.getId() + ", kreiran: " + nalogDTO.getVremeKreiranja();
-            } else {
-                return "N/A";
+            if (stavkaNaloga.getNalog() != null) {
+                Optional<Nalog> nalogDTO = nalogService.findById(stavkaNaloga.getNalog().getId());
+                return nalogDTO.map(n -> "Id: " + n.getId() + ", kreiran: " + n.getVremeKreiranja()).orElse("N/A");
             }
+            return "N/A";
         }).setHeader("Nalog");
+
+        // Kolona za Robu (učitavanje robe po ID-u)
         grid.addColumn(stavkaNaloga -> {
-            RobaDTO robaDTO = stavkaNaloga.getRoba();
-            if (robaDTO != null) {
-                return robaDTO.getNaziv() + " (Sifra: " + robaDTO.getSifra() + ")";
-            } else {
-                return "N/A";
+            if (stavkaNaloga.getRoba() != null) {
+                Optional<Roba> robaDTO = robaService.findById(stavkaNaloga.getRoba().getId());
+                return robaDTO.map(r -> r.getNaziv() + " (Šifra: " + r.getSifra() + ")").orElse("N/A");
             }
+            return "N/A";
         }).setHeader("Roba");
+
         grid.setSizeFull();
 
         grid.addColumn(new ComponentRenderer<>(stavkaNalogaDTO -> {
@@ -114,8 +114,16 @@ public class TabelaStavkaNalogaView extends Div {
         add(horizontalLayout);
     }
 
+    private void deleteStavkaNaloga(String id){
+        stavkaNalogaService.deleteById(id);
+        osveziPrikaz();
+    }
 
-    private void addStavkaNaloga(){
+    private void osveziPrikaz(){
+        grid.setItems(query -> stavkaNalogaService.lazyFindAll(query.getPage(), query.getPageSize()).stream());
+    }
+
+    private void addStavkaNaloga() {
         Dialog dialog = new Dialog();
         dialog.setWidth("500px");
 
@@ -130,7 +138,6 @@ public class TabelaStavkaNalogaView extends Div {
         TextField robaField = new TextField("Sifra robe");
         robaField.setRequiredIndicatorVisible(true);
 
-
         binder.forField(kolicinaField)
                 .asRequired("Field is required")
                 .withValidator(new IntegerRangeValidator("Field must be positive.", 0, Integer.MAX_VALUE))
@@ -138,35 +145,39 @@ public class TabelaStavkaNalogaView extends Div {
 
         binder.forField(nalogField)
                 .asRequired("Field is required")
-                .bind (
-                    stavkaNaloga -> stavkaNaloga.getNalog() != null ? String.valueOf(stavkaNaloga.getNalog().getId()) : "",
-                    (stavkaNaloga, nalogId) -> {
-                        if(nalogId != null){
-                            Optional<Nalog> nalog = nalogService.findById(Long.parseLong(nalogId));
-                            stavkaNaloga.setNalog(nalog.orElse(null));
-                        }else{
-                            stavkaNaloga.setNalog(null);
+                .bind(
+                        stavkaNaloga -> stavkaNaloga.getNalog() != null ? stavkaNaloga.getNalog().getId() : "",
+                        (stavkaNaloga, nalogId) -> {
+                            if (nalogId != null) {
+                                Optional<Nalog> nalog = nalogService.findById(nalogId);
+                                stavkaNaloga.setNalog(nalog.orElse(null));
+                            } else {
+                                stavkaNaloga.setNalog(null);
+                            }
                         }
-                    }
                 );
 
         binder.forField(robaField)
                 .asRequired("Field is required")
-                .bind (
-                    stavkaNaloga -> stavkaNaloga.getRoba() != null ? stavkaNaloga.getRoba().getSifra() : "",
-                    (stavkaNaloga, robaSifra) -> {
-                        if(robaSifra != null){
-                            Roba roba = robaService.findBySifra(robaSifra);
-                            stavkaNaloga.setRoba(roba);
-                        }else{
-                            stavkaNaloga.setRoba(null);
+                .bind(
+                        stavkaNaloga -> stavkaNaloga.getRoba() != null ? stavkaNaloga.getRoba().getSifra() : "",
+                        (stavkaNaloga, robaSifra) -> {
+                            if (robaSifra != null) {
+                                Roba roba = robaService.findBySifra(robaSifra);
+                                stavkaNaloga.setRoba(roba);
+                            } else {
+                                stavkaNaloga.setRoba(null);
+                            }
                         }
-                    }
                 );
 
         Button saveButton = new Button("Save", event -> {
             StavkaNaloga stavkaNaloga = new StavkaNaloga();
             if (binder.writeBeanIfValid(stavkaNaloga)) {
+                System.out.println("Nalog ID: " + (stavkaNaloga.getNalog() != null ? stavkaNaloga.getNalog().getId() : "null")
+                        + " | Roba ID: " + (stavkaNaloga.getRoba() != null ? stavkaNaloga.getRoba().getId() : "null")
+                        + " | Količina: " + stavkaNaloga.getKolicina());
+
                 stavkaNalogaService.create(stavkaNaloga);
 
                 this.osveziPrikaz();
@@ -182,9 +193,7 @@ public class TabelaStavkaNalogaView extends Div {
         dialog.open();
     }
 
-
-
-    private void editStavkaNaloga(StavkaNalogaDTO dto){
+    private void editStavkaNaloga(StavkaNalogaDTO dto) {
         Dialog dialog = new Dialog();
         dialog.setWidth("500px");
 
@@ -199,7 +208,6 @@ public class TabelaStavkaNalogaView extends Div {
         TextField robaField = new TextField("Sifra robe");
         robaField.setRequiredIndicatorVisible(true);
 
-
         binder.forField(kolicinaField)
                 .asRequired("Field is required")
                 .withValidator(new IntegerRangeValidator("Field must be positive.", 0, Integer.MAX_VALUE))
@@ -207,13 +215,13 @@ public class TabelaStavkaNalogaView extends Div {
 
         binder.forField(nalogField)
                 .asRequired("Field is required")
-                .bind (
-                        stavkaNaloga -> stavkaNaloga.getNalog() != null ? String.valueOf(stavkaNaloga.getNalog().getId()) : "",
+                .bind(
+                        stavkaNaloga -> stavkaNaloga.getNalog() != null ? stavkaNaloga.getNalog().getId() : "",
                         (stavkaNaloga, nalogId) -> {
-                            if(nalogId != null){
-                                Optional<Nalog> nalog = nalogService.findById(Long.parseLong(nalogId));
+                            if (nalogId != null) {
+                                Optional<Nalog> nalog = nalogService.findById(nalogId);
                                 stavkaNaloga.setNalog(nalog.orElse(null));
-                            }else{
+                            } else {
                                 stavkaNaloga.setNalog(null);
                             }
                         }
@@ -221,13 +229,13 @@ public class TabelaStavkaNalogaView extends Div {
 
         binder.forField(robaField)
                 .asRequired("Field is required")
-                .bind (
+                .bind(
                         stavkaNaloga -> stavkaNaloga.getRoba() != null ? stavkaNaloga.getRoba().getSifra() : "",
                         (stavkaNaloga, robaSifra) -> {
-                            if(robaSifra != null){
+                            if (robaSifra != null) {
                                 Roba roba = robaService.findBySifra(robaSifra);
                                 stavkaNaloga.setRoba(roba);
-                            }else{
+                            } else {
                                 stavkaNaloga.setRoba(null);
                             }
                         }
@@ -239,6 +247,7 @@ public class TabelaStavkaNalogaView extends Div {
 
         Button saveButton = new Button("Save", event -> {
             StavkaNaloga stavkaNaloga = new StavkaNaloga();
+
             if (binder.writeBeanIfValid(stavkaNaloga)) {
                 stavkaNaloga.setId(nn.getId());
                 stavkaNalogaService.update(stavkaNaloga);
@@ -255,12 +264,4 @@ public class TabelaStavkaNalogaView extends Div {
         dialog.add(new VerticalLayout(kolicinaField, nalogField, robaField, saveButton, cancelButton));
         dialog.open();
     }
-    private void deleteStavkaNaloga(Long id){
-        stavkaNalogaService.deleteById(id);
-        osveziPrikaz();
-    }
-    private void osveziPrikaz(){
-        grid.setItems(query -> stavkaNalogaService.lazyFindAll(query.getPage(), query.getPageSize()).stream());
-    }
-
 }

@@ -2,6 +2,7 @@ package com.example.application.services;
 
 import com.example.application.DTO.Konverzija;
 import com.example.application.DTO.RobaDTO;
+import com.example.application.entity.Nalog;
 import com.example.application.entity.Roba;
 import com.example.application.repository.RobaRepository;
 import jakarta.transaction.Transactional;
@@ -37,8 +38,12 @@ public class RobaService {
         return repository.findBySifra(sifra);
     }
 
+    public Optional<Roba> findById(String id) {
+        return repository.findById(id);
+    }
+
     @Transactional
-    public Optional<Roba> get(Long id) {
+    public Optional<Roba> get(String  id) {
         return repository.findById(id);
     }
 
@@ -50,7 +55,7 @@ public class RobaService {
         return this.repository.save(n);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(String  id) {
         repository.deleteById(id);
     }
 }
